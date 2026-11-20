@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="240dp"
+    android:height="240dp"
+    android:viewportWidth="1254"
+    android:viewportHeight="1254">
+
+    <!-- Background -->
+    <path
+        android:fillColor="#150340"
+        android:pathData="M340,0 H914 A340,340 0 0 1 1254,340 V914 A340,340 0 0 1 914,1254 H340 A340,340 0 0 1 0,914 V340 A340,340 0 0 1 340,0 Z" />
+
+    <!-- Cap base -->
+    <path
+        android:fillColor="#FCFAFF"
+        android:pathData="M433,420 L610,482 Q625,487 640,482 L818,420 L818,492 Q818,515 790,532 Q730,572 625,572 Q520,572 460,532 Q433,515 433,492 Z" />
+
+    <!-- Cap board -->
+    <path
+        android:fillColor="#FCFAFF"
+        android:pathData="M296,314 L612,192 Q625,188 638,192 L956,314 Q972,320 968,336 Q966,342 958,345 L645,457 Q625,465 605,457 L292,343 Q280,338 282,326 Q284,318 296,314 Z" />
+
+    <!-- Tassel -->
+    <path
+        android:fillColor="#FCFAFF"
+        android:pathData="M895,358 h24 v80 h-24 z" />
+    <path
+        android:fillColor="#FCFAFF"
+        android:pathData="M880,452 a28,28 0 1,0 56,0 a28,28 0 1,0 -56,0 z" />
+    <path
+        android:fillColor="#FCFAFF"
+        android:pathData="M892,478 L925,478 Q930,478 932,484 L948,556 Q949,574 935,574 L880,574 Q868,574 870,560 L886,484 Q888,478 892,478 Z" />
+
+    <!-- Left person -->
+    <path
+        android:fillColor="#FCFAFF"
+        android:pathData="M304,711 a78,78 0 1,0 156,0 a78,78 0 1,0 -156,0 z" />
+    <path
+        android:fillColor="#FCFAFF"
+        android:pathData="M248,958 Q220,958 220,930 Q225,870 280,825 Q320,800 355,800 L405,800 Q450,800 487,828 Q420,870 399,958 Z" />
+
+    <!-- Right person -->
+    <path
+        android:fillColor="#FCFAFF"
+        android:pathData="M791,711 a78,78 0 1,0 156,0 a78,78 0 1,0 -156,0 z" />
+    <path
+        android:fillColor="#FCFAFF"
+        android:pathData="M748,822 Q780,795 820,794 L932,796 Q870,820 826,900 Q800,850 748,822 Z" />
+
+    <!-- Center person (gap outline) -->
+    <path
+        android:fillColor="#FCFAFF"
+        android:strokeColor="#150340"
+        android:strokeWidth="14"
+        android:strokeLineJoin="round"
+        android:pathData="M457,1003 Q428,1003 428,975 Q435,900 500,855 Q555,820 625,822 Q700,822 755,858 Q815,900 815,972 Q815,1003 785,1003 Z" />
+    <path
+        android:fillColor="#FCFAFF"
+        android:pathData="M519,700 a107,107 0 1,0 214,0 a107,107 0 1,0 -214,0 z" />
+
+    <!-- Check badge -->
+    <path
+        android:fillColor="#8B4DFF"
+        android:pathData="M844,938 a134,134 0 1,0 268,0 a134,134 0 1,0 -268,0 z" />
+    <path
+        android:strokeColor="#FCFAFF"
+        android:strokeWidth="28"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:pathData="M910,942 L957,985 L1045,888" />
+</vector>

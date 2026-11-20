@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">حضور</string>
+
+    <string name="nav_home">الرئيسية</string>
+    <string name="nav_import">استيراد</string>
+    <string name="nav_search">بحث</string>
+    <string name="nav_scan">مسح</string>
+    <string name="nav_settings">الإعدادات</string>
+    <string name="back">رجوع</string>
+
+    <string name="home_scan">مسح رمز QR</string>
+    <string name="home_search">البحث عن تلميذ</string>
+    <string name="home_import">استيراد / تحديث القائمة</string>
+    <string name="home_students_loaded">عدد التلاميذ: %1$s</string>
+
+    <string name="import_title">استيراد قائمة التلاميذ</string>
+    <string name="import_pick_file">اختر ملف Excel أو CSV</string>
+    <string name="import_preview">معاينة (أول 5 صفوف)</string>
+    <string name="import_column_mapping">ربط الأعمدة</string>
+    <string name="import_code">الرمز</string>
+    <string name="import_first_name">الاسم</string>
+    <string name="import_family_name">اللقب</string>
+    <string name="import_start">استيراد</string>
+    <string name="import_progress">جارٍ الاستيراد: %1$s / %2$s</string>
+    <string name="import_report">مضاف: %1$s · محدّث: %2$s · متخطى: %3$s</string>
+    <string name="import_error">تعذر الاستيراد: %1$s</string>
+    <string name="import_empty_file">لم يتم العثور على صفوف تلاميذ.</string>
+    <string name="import_done">اكتمل الاستيراد</string>
+
+    <string name="search_title">البحث عن تلميذ</string>
+    <string name="search_placeholder">الاسم أو اللقب أو الرمز</string>
+    <string name="search_no_results">لم يتم العثور على تلميذ</string>
+
+    <string name="scan_title">مسح رمز QR</string>
+    <string name="scan_hint">ضع رمز QR داخل الإطار الصغير</string>
+    <string name="scan_not_found">التلميذ غير موجود</string>
+    <string name="scan_flashlight">الإضاءة</string>
+    <string name="scan_flashlight_on">الإضاءة مفعّلة</string>
+    <string name="scan_flashlight_off">الإضاءة متوقفة</string>
+    <string name="scan_retry">إعادة المحاولة</string>
+    <string name="scan_permission_required">إذن الكاميرا مطلوب</string>
+    <string name="scan_grant">السماح</string>
+    <string name="scan_picker_title">تم اكتشاف عدة رموز QR</string>
+    <string name="scan_picker_hint">اختر التلميذ المطلوب</string>
+    <string name="scan_unknown_code">رمز غير معروف</string>
+    <string name="scan_rescan">إعادة المسح</string>
+    <string name="scan_mode_camera">الكاميرا</string>
+    <string name="scan_mode_image">صورة</string>
+    <string name="scan_image_pick">اختر صورة</string>
+    <string name="scan_image_hint">صورة تحتوي على رمز واحد أو على كل الرموز</string>
+    <string name="scan_image_empty">لم يتم العثور على رموز QR في الصورة</string>
+    <string name="scan_image_error">تعذرت قراءة الصورة</string>
+
+    <string name="record_date">التاريخ</string>
+    <string name="student_cause">السبب</string>
+    <string name="student_notes">ملاحظة (اختياري)</string>
+    <string name="student_time">الوقت (اختياري)</string>
+    <string name="record_time_at">في</string>
+    <string name="record_time_range">من – إلى</string>
+    <string name="record_time_from">من</string>
+    <string name="record_time_to">إلى</string>
+    <string name="student_add_record">إضافة سجل</string>
+    <string name="student_edit_record">تعديل السجل</string>
+    <string name="student_save">حفظ</string>
+    <string name="student_delete">حذف</string>
+    <string name="student_cancel">إلغاء</string>
+    <string name="student_no_records">لا توجد سجلات</string>
+    <string name="student_total_lates">التأخرات</string>
+    <string name="student_total_absences">الغيابات</string>
+    <string name="student_top_cause">السبب الأكثر تكراراً</string>
+    <string name="student_count">%1$s</string>
+    <string name="student_top_cause_count">%1$s (%2$s)</string>
+    <string name="filter_all">الكل</string>
+    <string name="filter_late">التأخرات</string>
+    <string name="filter_absent">الغيابات</string>
+    <string name="filter_period_all">الكل</string>
+    <string name="filter_period_today">اليوم</string>
+    <string name="filter_period_week">7 أيام</string>
+    <string name="filter_search_records">تصفية حسب السبب أو الملاحظة أو الوقت</string>
+    <string name="record_type_late">تأخر</string>
+    <string name="record_type_absent">غياب</string>
+    <string name="cause_illness">مرض</string>
+    <string name="cause_transport">نقل</string>
+    <string name="cause_family">سبب عائلي</string>
+    <string name="cause_medical">موعد طبي</string>
+    <string name="cause_unjustified">غير مبرر</string>
+    <string name="cause_other">أخرى</string>
+
+    <string name="settings_title">الإعدادات</string>
+    <string name="settings_causes">إدارة الأسباب</string>
+    <string name="settings_add_cause">إضافة سبب</string>
+    <string name="settings_edit_cause">تعديل السبب</string>
+    <string name="settings_no_causes">لا توجد أسباب</string>
+    <string name="settings_cause_label">اسم السبب</string>
+    <string name="settings_export">تصدير السجلات (CSV)</string>
+    <string name="settings_import_csv">استعادة من CSV</string>
+    <string name="settings_theme">المظهر</string>
+    <string name="settings_theme_system">النظام</string>
+    <string name="settings_theme_light">فاتح</string>
+    <string name="settings_theme_dark">داكن</string>
+    <string name="settings_language">اللغة</string>
+    <string name="settings_language_french">الفرنسية</string>
+    <string name="settings_language_arabic">العربية</string>
+    <string name="settings_export_done">اكتمل التصدير: %1$s</string>
+    <string name="settings_export_empty">لا توجد سجلات للتصدير</string>
+    <string name="settings_restore_done">اكتملت الاستعادة: %1$s سجلاً</string>
+    <string name="settings_error">خطأ: %1$s</string>
+    <string name="settings_developer">المطوّر</string>
+    <string name="settings_image_scan">المسح من صورة</string>
+    <string name="settings_image_scan_hint">يعرض وضعين في الماسح: الكاميرا أو صورة تحتوي على رمز QR واحد أو عدة رموز.</string>
+</resources>
