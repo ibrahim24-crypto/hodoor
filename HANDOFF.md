@@ -51,10 +51,31 @@ Confirmed choices:
 - Merge: **one-way from host** — receiving phones replace their data.
 - UI: **new Sync screen** with Host / Join, status, progress; entry point in Settings.
 
-No sync code was written. A read-only exploration of the data layer was started but not used.
-Likely approach (no new dependencies): `org.json` (Android platform) payload over `ServerSocket`
-on the host and `HttpURLConnection`/plain sockets on the client; add `INTERNET` permission and
-cleartext LAN traffic allowance; repository needs bulk replace methods for all three tables.
+No sync code was written.
+
+### Data-layer map for the sync implementation
+- Entities (`data/entities/Entities.kt`): `Student(code PK, firstName, familyName, searchName)`;
+  `Record(id auto PK, studentCode FK ON DELETE CASCADE, type: RecordType, date, time?, cause: String, note?)`;
+  `Cause(id auto PK, label)`. `RecordType` is stored as its enum name via `Converters`;
+  `Record.cause` is free text, not a FK. `searchName` can be rebuilt with
+  `data/TextUtils.kt: normalizedStudentName(firstName, familyName)`.
+- DAOs: `StudentDao` has `allCodes()`, `byCodes()`, `upsertAll()` — no all-rows query and no
+  delete-all. `RecordDao` has `all()`, `insertAll()`, `deleteForStudent()`. `CauseDao` has
+  `allOnce()`, `insert`, `update`, `delete` — no bulk insert/delete-all.
+- `data/repository/DataRepository.kt`: has `allStudentCodes`, `studentsByCodes`, `allRecords`,
+  `addRecords`, `addCause`, etc. Missing for a true replace-all restore: all students as full
+  objects, a suspend all-causes method, table clearing, and a public transaction wrapper.
+  `importStudents` is currently the only user of `db.withTransaction`.
+- `data/db/HodoorDatabase.kt`: version 1, `hodoor.db`; `androidx.room.withTransaction` is
+  available via `room-ktx`. Restore order: clear `records` -> `students`, then `causes`.
+- `data/backup/CsvBackup.kt` covers records only (no ids, students, or causes);
+  `SettingsViewModel.restoreFrom` silently drops unknown student codes and appends rows.
+- No Gson / Moshi / kotlinx-serialization is declared. Use platform `org.json` to stay
+  dependency-free. Likely transport: `ServerSocket` on the host, HTTP/`HttpURLConnection`
+  or plain sockets on the client; add `INTERNET` permission and cleartext LAN allowance.
+- “Everything” also includes SharedPreferences `hodoor_settings`: `theme`, `last_record_date`,
+  `scan_mode`, `scan_confirmation`, `after_import`, `language` (`LocaleHelper`).
+- DI entry point: `AppContainer.repository`.
 
 ## Build / install state
 - Last build: `./gradlew assembleDebug --no-daemon --max-workers=2 --console=plain`
