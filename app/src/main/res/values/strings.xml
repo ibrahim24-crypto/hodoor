@@ -13,6 +13,11 @@
     <string name="home_search">Rechercher un élève</string>
     <string name="home_import">Importer / mettre à jour la liste</string>
     <string name="home_students_loaded">%1$s élèves chargés</string>
+    <string name="home_scan_subtitle">Lire le QR d\'un élève avec la caméra ou une image</string>
+    <string name="home_search_subtitle">Trouver un élève par nom ou par code</string>
+    <string name="home_empty_title">Aucun élève pour le moment</string>
+    <string name="home_empty_hint">Importez votre liste depuis un fichier Excel ou CSV pour commencer.</string>
+    <string name="home_import_action">Importer les élèves</string>
 
     <string name="import_title">Importer la liste des élèves</string>
     <string name="import_pick_file">Choisir un fichier Excel ou CSV</string>
@@ -51,6 +56,12 @@
     <string name="scan_image_hint">Image avec un seul code ou avec tous les codes</string>
     <string name="scan_image_empty">Aucun QR code trouvé dans l\'image</string>
     <string name="scan_image_error">Impossible de lire l\'image</string>
+    <string name="scan_snapshot_count">%1$d codes détectés</string>
+    <string name="scan_mode_single">Single</string>
+    <string name="scan_mode_multi">Multi</string>
+    <string name="scan_multi_hint">Point at the codes, then tap the button</string>
+    <string name="scan_multi_empty">No code found, try again</string>
+    <string name="scan_shutter">Take photo</string>
 
     <string name="record_date">Date</string>
     <string name="student_cause">Cause</string>

@@ -13,6 +13,11 @@
     <string name="home_search">البحث عن تلميذ</string>
     <string name="home_import">استيراد / تحديث القائمة</string>
     <string name="home_students_loaded">عدد التلاميذ: %1$s</string>
+    <string name="home_scan_subtitle">اقرأ رمز تلميذ بالكاميرا أو من صورة</string>
+    <string name="home_search_subtitle">ابحث عن تلميذ بالاسم أو بالرمز</string>
+    <string name="home_empty_title">لا يوجد تلاميذ بعد</string>
+    <string name="home_empty_hint">استورد قائمتك من ملف Excel أو CSV للبدء.</string>
+    <string name="home_import_action">استيراد التلاميذ</string>
 
     <string name="import_title">استيراد قائمة التلاميذ</string>
     <string name="import_pick_file">اختر ملف Excel أو CSV</string>
@@ -51,6 +56,7 @@
     <string name="scan_image_hint">صورة تحتوي على رمز واحد أو على كل الرموز</string>
     <string name="scan_image_empty">لم يتم العثور على رموز QR في الصورة</string>
     <string name="scan_image_error">تعذرت قراءة الصورة</string>
+    <string name="scan_snapshot_count">تم اكتشاف %1$d رمزًا</string>
 
     <string name="record_date">التاريخ</string>
     <string name="student_cause">السبب</string>

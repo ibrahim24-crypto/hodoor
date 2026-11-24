@@ -1,8 +1,19 @@
 package com.himo.hodoor.ui.navigation
 
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.unit.LayoutDirection
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
@@ -31,6 +42,7 @@ import com.himo.hodoor.ui.screens.SplashScreen
 import com.himo.hodoor.ui.screens.SettingsViewModel
 import com.himo.hodoor.ui.screens.StudentScreen
 import com.himo.hodoor.ui.screens.StudentViewModel
+import com.himo.hodoor.ui.theme.rememberAnimationsEnabled
 
 object Route {
     const val ArgStudentCode = "studentCode"
@@ -50,8 +62,38 @@ fun HodoorNavHost(
     navController: NavHostController = rememberNavController(),
     startDestination: String = Route.Splash
 ) {
+    val animationsEnabled = rememberAnimationsEnabled()
+    val density = LocalDensity.current
+    val isLtr = LocalLayoutDirection.current == LayoutDirection.Ltr
+    val duration = if (animationsEnabled) 250 else 0
+
+    // END edge is right in LTR and left in RTL; START edge is the mirror.
+    val endOffset: (Int) -> Int = {
+        with(density) { (if (isLtr) 24.dp else (-24).dp).toPx().toInt() }
+    }
+    val startOffset: (Int) -> Int = {
+        with(density) { (if (isLtr) (-24).dp else 24.dp).toPx().toInt() }
+    }
+
+    val enterForward: EnterTransition =
+        fadeIn(tween(duration)) + slideInHorizontally(tween(duration), endOffset)
+    val exitForward: ExitTransition =
+        fadeOut(tween(duration)) + slideOutHorizontally(tween(duration), endOffset)
+    val enterBack: EnterTransition =
+        fadeIn(tween(duration)) + slideInHorizontally(tween(duration), startOffset)
+    val exitBack: ExitTransition =
+        fadeOut(tween(duration)) + slideOutHorizontally(tween(duration), startOffset)
+    val plainFadeIn: EnterTransition = fadeIn(tween(duration))
+    val plainFadeOut: ExitTransition = fadeOut(tween(duration))
+
     NavHost(navController = navController, startDestination = startDestination) {
-        composable(Route.Splash) {
+        composable(
+            Route.Splash,
+            enterTransition = { plainFadeIn },
+            exitTransition = { plainFadeOut },
+            popEnterTransition = { plainFadeIn },
+            popExitTransition = { plainFadeOut }
+        ) {
             SplashScreen(
                 onFinished = {
                     navController.navigate(Route.Home) {
@@ -60,7 +102,13 @@ fun HodoorNavHost(
                 }
             )
         }
-        composable(Route.Home) {
+        composable(
+            Route.Home,
+            enterTransition = { plainFadeIn },
+            exitTransition = { exitForward },
+            popEnterTransition = { enterBack },
+            popExitTransition = { exitBack }
+        ) {
             val app = LocalContext.current.applicationContext as HodoorApp
             val homeViewModel: HomeViewModel = viewModel(
                 factory = HomeViewModelFactory(app.container.repository)
@@ -74,7 +122,13 @@ fun HodoorNavHost(
                 studentCount = studentCount
             )
         }
-        composable(Route.Import) {
+        composable(
+            Route.Import,
+            enterTransition = { enterForward },
+            exitTransition = { exitForward },
+            popEnterTransition = { enterBack },
+            popExitTransition = { exitBack }
+        ) {
             val context = LocalContext.current
             val app = context.applicationContext as HodoorApp
             val importViewModel: ImportViewModel = viewModel(
@@ -85,7 +139,13 @@ fun HodoorNavHost(
                 onBack = { navController.navigateUp() }
             )
         }
-        composable(Route.Search) {
+        composable(
+            Route.Search,
+            enterTransition = { enterForward },
+            exitTransition = { exitForward },
+            popEnterTransition = { enterBack },
+            popExitTransition = { exitBack }
+        ) {
             val app = LocalContext.current.applicationContext as HodoorApp
             val searchViewModel: SearchViewModel = viewModel(
                 factory = SearchViewModelFactory(app.container.repository)
@@ -96,7 +156,13 @@ fun HodoorNavHost(
                 onBack = { navController.navigateUp() }
             )
         }
-        composable(Route.Scan) {
+        composable(
+            Route.Scan,
+            enterTransition = { enterForward },
+            exitTransition = { exitForward },
+            popEnterTransition = { enterBack },
+            popExitTransition = { exitBack }
+        ) {
             val app = LocalContext.current.applicationContext as HodoorApp
             val scannerViewModel: ScannerViewModel = viewModel(
                 factory = ScannerViewModelFactory(app.container.repository)
@@ -111,7 +177,13 @@ fun HodoorNavHost(
                 onBack = { navController.navigateUp() }
             )
         }
-        composable(Route.Settings) {
+        composable(
+            Route.Settings,
+            enterTransition = { enterForward },
+            exitTransition = { exitForward },
+            popEnterTransition = { enterBack },
+            popExitTransition = { exitBack }
+        ) {
             val app = LocalContext.current.applicationContext as HodoorApp
             val settingsViewModel: SettingsViewModel = viewModel(
                 factory = SettingsViewModelFactory(app.container.repository)
@@ -123,7 +195,11 @@ fun HodoorNavHost(
         }
         composable(
             route = Route.StudentRoute,
-            arguments = listOf(navArgument(Route.ArgStudentCode) { type = NavType.StringType })
+            arguments = listOf(navArgument(Route.ArgStudentCode) { type = NavType.StringType }),
+            enterTransition = { enterForward },
+            exitTransition = { exitForward },
+            popEnterTransition = { enterBack },
+            popExitTransition = { exitBack }
         ) { backStackEntry ->
             val app = LocalContext.current.applicationContext as HodoorApp
             val studentViewModel: StudentViewModel = viewModel(
