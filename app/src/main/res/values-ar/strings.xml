@@ -57,6 +57,12 @@
     <string name="scan_image_empty">لم يتم العثور على رموز QR في الصورة</string>
     <string name="scan_image_error">تعذرت قراءة الصورة</string>
     <string name="scan_snapshot_count">تم اكتشاف %1$d رمزًا</string>
+    <string name="scan_mode_single">مفرد</string>
+    <string name="scan_mode_multi">متعدد</string>
+    <string name="scan_multi_hint">وجّه الكاميرا نحو الرموز ثم اضغط الزر</string>
+    <string name="scan_photo_hint">وجّه الكاميرا نحو الرمز ثم اضغط الزر</string>
+    <string name="scan_multi_empty">لم يتم العثور على رمز، حاول مرة أخرى</string>
+    <string name="scan_shutter">التقط صورة</string>
 
     <string name="record_date">التاريخ</string>
     <string name="student_cause">السبب</string>
@@ -112,7 +118,12 @@
     <string name="settings_export_empty">لا توجد سجلات للتصدير</string>
     <string name="settings_restore_done">اكتملت الاستعادة: %1$s سجلاً</string>
     <string name="settings_error">خطأ: %1$s</string>
-    <string name="settings_developer">المطوّر</string>
-    <string name="settings_image_scan">المسح من صورة</string>
-    <string name="settings_image_scan_hint">يعرض وضعين في الماسح: الكاميرا أو صورة تحتوي على رمز QR واحد أو عدة رموز.</string>
+    <string name="settings_scan_behavior">تأكيد المسح</string>
+    <string name="settings_scan_slow">بطيء (تلقائي)</string>
+    <string name="settings_scan_photo">التقط صورة</string>
+    <string name="settings_after_import">بعد استيراد ناجح</string>
+    <string name="settings_after_import_ask">اسأل</string>
+    <string name="settings_after_import_home">الرئيسية</string>
+    <string name="settings_import_more">استيراد ملف آخر</string>
+    <string name="settings_import_done_question">اكتمل الاستيراد: %1$s سجلاً. هل تريد استيراد ملف آخر؟</string>
 </resources>

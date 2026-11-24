@@ -39,12 +39,25 @@ private const val TIME_HINT = "HH:MM"
 
 private enum class TimeMode { AT, RANGE }
 
+/** Formats typed digits as HH:MM, e.g. 1400 -> 14:00. */
+private fun formatTimeInput(raw: String): String {
+    val digits = raw.filter { it.isDigit() }.take(4)
+    if (digits.isEmpty()) return ""
+    if (raw.contains(':') && raw.length <= 5 && raw.all { it.isDigit() || it == ':' }) return raw
+    return if (digits.length <= 2) digits else "${digits.take(2)}:${digits.drop(2)}"
+}
+
+/** Normalizes both AT and RANGE values, including values saved before auto-formatting. */
+private fun normalizeStoredTime(stored: String): String =
+    stored.split(TIME_RANGE_SEPARATOR, limit = 2)
+        .joinToString(TIME_RANGE_SEPARATOR) { formatTimeInput(it.trim()) }
+
 /** Splits a stored time into its editing mode and values. */
 private fun splitStoredTime(stored: String?): Pair<TimeMode, Pair<String, String>> {
     if (stored.isNullOrBlank()) return TimeMode.AT to ("" to "")
-    val parts = stored.split(TIME_RANGE_SEPARATOR, limit = 2)
+    val parts = normalizeStoredTime(stored).split(TIME_RANGE_SEPARATOR, limit = 2)
     return if (parts.size == 2) TimeMode.RANGE to (parts[0] to parts[1])
-    else TimeMode.AT to (stored to "")
+    else TimeMode.AT to (parts[0] to "")
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -130,7 +143,7 @@ fun RecordEditorDialog(
                 if (timeMode == TimeMode.AT) {
                     OutlinedTextField(
                         value = timeAt,
-                        onValueChange = { timeAt = it },
+                        onValueChange = { timeAt = formatTimeInput(it) },
                         singleLine = true,
                         label = { Text(stringResource(R.string.student_time)) },
                         placeholder = { Text(TIME_HINT) },
@@ -140,7 +153,7 @@ fun RecordEditorDialog(
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         OutlinedTextField(
                             value = timeFrom,
-                            onValueChange = { timeFrom = it },
+                            onValueChange = { timeFrom = formatTimeInput(it) },
                             singleLine = true,
                             label = { Text(stringResource(R.string.record_time_from)) },
                             placeholder = { Text(TIME_HINT) },
@@ -148,7 +161,7 @@ fun RecordEditorDialog(
                         )
                         OutlinedTextField(
                             value = timeTo,
-                            onValueChange = { timeTo = it },
+                            onValueChange = { timeTo = formatTimeInput(it) },
                             singleLine = true,
                             label = { Text(stringResource(R.string.record_time_to)) },
                             placeholder = { Text(TIME_HINT) },
@@ -209,7 +222,7 @@ fun RecordEditorDialog(
                             if (from.isBlank() && to.isBlank()) null
                             else "$from$TIME_RANGE_SEPARATOR$to"
                         }
-                    }
+                    }?.let(::normalizeStoredTime)
                     onSave(type, epochDay, storedTime, cause, note)
                 },
                 enabled = cause.isNotBlank()

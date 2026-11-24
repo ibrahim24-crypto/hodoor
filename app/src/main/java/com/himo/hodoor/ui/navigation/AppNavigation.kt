@@ -190,7 +190,12 @@ fun HodoorNavHost(
             )
             SettingsScreen(
                 viewModel = settingsViewModel,
-                onBack = { navController.navigateUp() }
+                onBack = { navController.navigateUp() },
+                onHome = {
+                    navController.navigate(Route.Home) {
+                        popUpTo(Route.Home) { inclusive = true }
+                    }
+                }
             )
         }
         composable(

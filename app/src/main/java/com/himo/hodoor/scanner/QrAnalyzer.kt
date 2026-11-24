@@ -29,7 +29,9 @@ data class QrDetection(
     val right: Int,
     val bottom: Int,
     /** Four corners when ML Kit reports them, so tilted QR frames stay aligned. */
-    val corners: List<Pair<Float, Float>> = emptyList()
+    val corners: List<Pair<Float, Float>> = emptyList(),
+    /** Whether the code is inside the Single-mode centre frame (unused for Multi). */
+    val inScanFrame: Boolean = true
 )
 
 /** Scales a detection (including its corners) from one coordinate space to another. */
@@ -281,7 +283,7 @@ private fun mapDetection(
 
 /**
  * Detects QR codes in camera frames. Boxes are transformed into PreviewView pixels;
- * Single mode additionally applies the centred scan-frame filter.
+ * Single mode additionally marks which codes lie in the centred scan frame.
  */
 class QrAnalyzer(
     private val multiMode: Boolean,
@@ -339,20 +341,22 @@ class QrAnalyzer(
                     mapDetection(payload, box, barcode.cornerPoints, mapping, viewWidth, viewHeight)
                 }
 
-                val visible = if (multiMode) {
-                    detections
-                } else {
-                    val side = minOf(viewWidth, viewHeight) * SCAN_FRAME_FRACTION
-                    val left = (viewWidth - side) / 2f
-                    val top = (viewHeight - side) / 2f
-                    val right = left + side
-                    val bottom = top + side
-                    detections.filter { d ->
-                        val centerX = (d.left + d.right) / 2f
-                        val centerY = (d.top + d.bottom) / 2f
-                        centerX in left..right && centerY in top..bottom
+                // Every code is reported for the live highlight. Single mode only marks
+                // which ones are inside the centre frame; navigation uses that flag.
+                val side = minOf(viewWidth, viewHeight) * SCAN_FRAME_FRACTION
+                val left = (viewWidth - side) / 2f
+                val top = (viewHeight - side) / 2f
+                val right = left + side
+                val bottom = top + side
+                val visible = detections.distinctBy { it.payload }.map { detection ->
+                    if (multiMode) detection else {
+                        val centerX = (detection.left + detection.right) / 2f
+                        val centerY = (detection.top + detection.bottom) / 2f
+                        detection.copy(
+                            inScanFrame = centerX in left..right && centerY in top..bottom
+                        )
                     }
-                }.distinctBy { it.payload }
+                }
 
                 // Keep an occasional upright frame as a fallback if ImageCapture is
                 // unavailable. Multi mode needs a frame even with zero detections.

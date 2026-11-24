@@ -101,6 +101,9 @@ import kotlinx.coroutines.delay
 
 private enum class ScannerMode { SINGLE, MULTI }
 
+/** Longer confirmation window for the "slow" setting (was 700 ms). */
+private const val SLOW_SCAN_DELAY_MS = 1500L
+
 /** Mutable 700 ms union window; a plain holder avoids stale captures in analyzer callbacks. */
 private class ScanWindow {
     var start = 0L
@@ -113,6 +116,66 @@ private class ScanWindow {
         decisionMade = false
         detections.clear()
         frameInfo = null
+    }
+}
+
+/** Eases box movement so small hand shakes do not make frames jump or vanish. */
+private fun blendDetection(old: QrDetection, next: QrDetection): QrDetection {
+    val weight = 0.6f
+    fun mix(from: Int, to: Int) = (from + (to - from) * weight).toInt()
+    fun mix(from: Float, to: Float) = from + (to - from) * weight
+    val corners = if (old.corners.size == next.corners.size && next.corners.isNotEmpty()) {
+        old.corners.zip(next.corners) { first, second ->
+            mix(first.first, second.first) to mix(first.second, second.second)
+        }
+    } else {
+        next.corners
+    }
+    return QrDetection(
+        payload = next.payload,
+        left = mix(old.left, next.left),
+        top = mix(old.top, next.top),
+        right = mix(old.right, next.right),
+        bottom = mix(old.bottom, next.bottom),
+        corners = corners,
+        inScanFrame = next.inScanFrame
+    )
+}
+
+/**
+ * Keeps live boxes for a few missed frames. ML Kit can miss a code while the phone moves;
+ * without this grace period every box disappears and reappears on each shaky frame.
+ */
+private class DetectionTracker {
+    private class Tracked(
+        var detection: QrDetection,
+        var lastSeen: Long,
+        var misses: Int
+    )
+
+    private val tracked = LinkedHashMap<String, Tracked>()
+
+    fun update(detections: List<QrDetection>, now: Long): List<QrDetection> {
+        val seen = HashSet<String>()
+        detections.forEach { detection ->
+            seen += detection.payload
+            val previous = tracked[detection.payload]
+            if (previous == null) {
+                tracked[detection.payload] = Tracked(detection, now, 0)
+            } else {
+                previous.detection = blendDetection(previous.detection, detection)
+                previous.lastSeen = now
+                previous.misses = 0
+            }
+        }
+        tracked.entries.removeAll { (payload, item) ->
+            payload !in seen && (++item.misses >= 3 || now - item.lastSeen > 700L)
+        }
+        return tracked.values.map { it.detection }
+    }
+
+    fun clear() {
+        tracked.clear()
     }
 }
 
@@ -133,7 +196,7 @@ fun ScannerScreen(
     val snapshot by viewModel.snapshot.collectAsStateWithLifecycle()
     val imageError by viewModel.imageError.collectAsStateWithLifecycle()
     val notFoundMessage by viewModel.notFoundMessage.collectAsStateWithLifecycle()
-    val developerMode by remember { mutableStateOf(AppSettings.imageScanEnabled(context)) }
+    val scanConfirmation = remember { AppSettings.scanConfirmation(context) }
     var mode by remember {
         mutableStateOf(
             if (AppSettings.scanMode(context) == "multi") ScannerMode.MULTI else ScannerMode.SINGLE
@@ -164,6 +227,7 @@ fun ScannerScreen(
     var torchOn by remember { mutableStateOf(false) }
     var scanSession by remember { mutableStateOf(0) }
     val window = remember { ScanWindow() }
+    val tracker = remember { DetectionTracker() }
     var windowTick by remember { mutableStateOf(0L) }
     var visibleDetections by remember { mutableStateOf<List<QrDetection>>(emptyList()) }
     var detectionFrame by remember { mutableStateOf<FrameInfo?>(null) }
@@ -199,7 +263,7 @@ fun ScannerScreen(
     LaunchedEffect(windowTick) {
         val tick = windowTick
         if (tick <= 0L) return@LaunchedEffect
-        delay(700)
+        delay(SLOW_SCAN_DELAY_MS)
         if (window.start != tick) return@LaunchedEffect
         val union = window.detections.values.toList()
         val info = window.frameInfo
@@ -220,6 +284,7 @@ fun ScannerScreen(
 
     LaunchedEffect(scanSession, mode) {
         window.reset()
+        tracker.clear()
         windowTick = 0L
         visibleDetections = emptyList()
         detectionFrame = null
@@ -327,10 +392,15 @@ fun ScannerScreen(
             val qrAnalyzer = QrAnalyzer(
                 multiMode = mode == ScannerMode.MULTI,
                 onResult = { frameInfo, detections ->
-                    visibleDetections = detections
                     detectionFrame = frameInfo
-                    if (mode == ScannerMode.SINGLE && detections.isNotEmpty() &&
-                        !window.decisionMade && scanning
+                    visibleDetections = tracker.update(detections, SystemClock.elapsedRealtime())
+                    val centered = if (mode == ScannerMode.SINGLE) {
+                        detections.filter { it.inScanFrame }
+                    } else {
+                        detections
+                    }
+                    if (mode == ScannerMode.SINGLE && scanConfirmation == "slow" &&
+                        centered.isNotEmpty() && !window.decisionMade && scanning
                     ) {
                         if (window.start == 0L) {
                             window.start = SystemClock.elapsedRealtime()
@@ -338,7 +408,7 @@ fun ScannerScreen(
                             window.frameInfo = frameInfo
                             windowTick = window.start
                         }
-                        for (detection in detections) {
+                        for (detection in centered) {
                             if (!window.detections.containsKey(detection.payload)) {
                                 window.detections[detection.payload] = detection
                             }
@@ -553,30 +623,28 @@ fun ScannerScreen(
             )
         }
 
-        if (developerMode) {
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                modifier = Modifier
-                    .align(Alignment.TopCenter)
-                    .padding(top = 104.dp)
-            ) {
-                FilterChip(
-                    selected = !useImageMode,
-                    onClick = {
-                        if (useImageMode) {
-                            useImageMode = false
-                            viewModel.retry()
-                            scanSession++
-                        }
-                    },
-                    label = { Text(stringResource(R.string.scan_mode_camera)) }
-                )
-                FilterChip(
-                    selected = useImageMode,
-                    onClick = { useImageMode = true },
-                    label = { Text(stringResource(R.string.scan_mode_image)) }
-                )
-            }
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            modifier = Modifier
+                .align(Alignment.TopCenter)
+                .padding(top = 104.dp)
+        ) {
+            FilterChip(
+                selected = !useImageMode,
+                onClick = {
+                    if (useImageMode) {
+                        useImageMode = false
+                        viewModel.retry()
+                        scanSession++
+                    }
+                },
+                label = { Text(stringResource(R.string.scan_mode_camera)) }
+            )
+            FilterChip(
+                selected = useImageMode,
+                onClick = { useImageMode = true },
+                label = { Text(stringResource(R.string.scan_mode_image)) }
+            )
         }
 
         IconButton(
@@ -632,7 +700,11 @@ fun ScannerScreen(
                         start = 24.dp,
                         top = 24.dp,
                         end = 24.dp,
-                        bottom = if (mode == ScannerMode.MULTI) 120.dp else 24.dp
+                        bottom = if (mode == ScannerMode.MULTI || scanConfirmation == "photo") {
+                            120.dp
+                        } else {
+                            24.dp
+                        }
                     )
             ) {
                 Icon(
@@ -643,16 +715,19 @@ fun ScannerScreen(
                 )
                 Text(
                     text = stringResource(
-                        if (mode == ScannerMode.MULTI) R.string.scan_multi_hint
-                        else R.string.scan_hint
+                        when {
+                            mode == ScannerMode.MULTI -> R.string.scan_multi_hint
+                            scanConfirmation == "photo" -> R.string.scan_photo_hint
+                            else -> R.string.scan_hint
+                        }
                     ),
                     color = Color.White
                 )
             }
         }
 
-        if (!useImageMode && mode == ScannerMode.MULTI && scanning &&
-            matchedCode == null && !notFound
+        if (!useImageMode && scanning && matchedCode == null && !notFound &&
+            (mode == ScannerMode.MULTI || scanConfirmation == "photo")
         ) {
             Box(
                 modifier = Modifier
@@ -663,7 +738,7 @@ fun ScannerScreen(
                     .background(Color.White)
                     .clickable {
                         clearAnalysis()
-                        triggerCapture(true, emptyList(), null)
+                        triggerCapture(mode == ScannerMode.MULTI, emptyList(), null)
                     },
                 contentAlignment = Alignment.Center
             ) {

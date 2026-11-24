@@ -6,8 +6,9 @@ object AppSettings {
     private const val Preferences = "hodoor_settings"
     private const val KeyTheme = "theme"
     private const val KeyLastRecordDate = "last_record_date"
-    private const val KeyImageScan = "developer_image_scan"
     private const val KeyScanMode = "scan_mode"
+    private const val KeyScanConfirmation = "scan_confirmation"
+    private const val KeyAfterImport = "after_import"
 
     private fun prefs(context: Context) =
         context.getSharedPreferences(Preferences, Context.MODE_PRIVATE)
@@ -27,14 +28,6 @@ object AppSettings {
         prefs(context).edit().putLong(KeyLastRecordDate, epochDay).apply()
     }
 
-    /** Developer option: replace the live camera with a gallery image picker. */
-    fun imageScanEnabled(context: Context): Boolean =
-        prefs(context).getBoolean(KeyImageScan, false)
-
-    fun setImageScanEnabled(context: Context, value: Boolean) {
-        prefs(context).edit().putBoolean(KeyImageScan, value).apply()
-    }
-
     /** Scanner mode: "single" (frame-assisted) or "multi" (shutter photo). */
     fun scanMode(context: Context): String =
         prefs(context).getString(KeyScanMode, "single")
@@ -43,6 +36,31 @@ object AppSettings {
     fun setScanMode(context: Context, value: String) {
         prefs(context).edit()
             .putString(KeyScanMode, if (value == "multi") "multi" else "single")
+            .apply()
+    }
+
+    /**
+     * Single-mode confirmation: "slow" waits 1.5 s on live detections, "photo" waits
+     * for the user to take a picture before scanning it.
+     */
+    fun scanConfirmation(context: Context): String =
+        prefs(context).getString(KeyScanConfirmation, "slow")
+            ?.takeIf { it == "slow" || it == "photo" } ?: "slow"
+
+    fun setScanConfirmation(context: Context, value: String) {
+        prefs(context).edit()
+            .putString(KeyScanConfirmation, if (value == "photo") "photo" else "slow")
+            .apply()
+    }
+
+    /** What happens after a successful CSV restore: ask in a dialog or go Home. */
+    fun afterImport(context: Context): String =
+        prefs(context).getString(KeyAfterImport, "ask")
+            ?.takeIf { it == "ask" || it == "home" } ?: "ask"
+
+    fun setAfterImport(context: Context, value: String) {
+        prefs(context).edit()
+            .putString(KeyAfterImport, if (value == "home") "home" else "ask")
             .apply()
     }
 }
